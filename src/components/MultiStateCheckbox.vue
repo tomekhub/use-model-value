@@ -1,8 +1,9 @@
 <template>
-<div class="checkbox" @click="handleClick">
-  <div class="checkbox__container">
-    <FontAwesomeIcon icon="check" v-if="state === 'selected'" class="checkbox__icon" />
-    <FontAwesomeIcon icon="times" v-if="state === 'excluded'" class="checkbox__icon" />
+  <div class="checkbox" @click="handleClick()">
+    <input class="checkbox__hidden" type="checkbox" :indeterminate="state === CheckboxState.EXCLUDED" :checked="state === CheckboxState.SELECTED">
+    <div class="checkbox__container" role="checkbox">
+    <FontAwesomeIcon icon="check" v-if="state === CheckboxState.SELECTED" class="checkbox__icon" />
+    <FontAwesomeIcon icon="times" v-if="state === CheckboxState.EXCLUDED" class="checkbox__icon" />
   </div>
   <div class="checkbox__label" v-if="stateLabels">{{stateLabels[state]}}</div>
 </div>
@@ -23,7 +24,7 @@ export default defineComponent({
   components: {
     FontAwesomeIcon
   },
-  emits: ['state-update'],
+  emits: ['update:modelValue'],
   props: {
     modelValue: {
       type: String as PropType<ComponentPropsType['modelValue']>,
@@ -46,14 +47,15 @@ export default defineComponent({
         case SELECTED:
           state.value = EXCLUDED
           break
-        default:
+        case EXCLUDED:
           state.value = UNSELECTED
           break
       }
     }
     return {
       handleClick,
-      state
+      state,
+      CheckboxState
     }
   }
 })
@@ -66,11 +68,16 @@ $police-blue: #34495E;
   cursor: pointer;
   display: flex;
   align-items: center;
-
+  &__hidden {
+    display: none;
+  }
   &__container {
     width: 20px;
     height: 20px;
     border: 3px solid $police-blue;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   &__icon {
     color: $mint;
